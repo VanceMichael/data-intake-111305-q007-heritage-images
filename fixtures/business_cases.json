@@ -1,17 +1,17 @@
 [
   {
-    "name": "revocation_during_handoff",
-    "situation": "许可检查后撤权并交接",
-    "observable": "过时领取不继续下载"
+    "name": "undo_announce",
+    "situation": "取消转发且原作者内容仍存在",
+    "observable": "只撤展示关系，不删原对象"
   },
   {
-    "name": "rendition_scope",
-    "situation": "缩略图与原图权限不同",
-    "observable": "不借缩略图许可放行原图"
+    "name": "untrusted_delete",
+    "situation": "另一账号转来删除声明",
+    "observable": "核对归属而不直接抹除"
   },
   {
-    "name": "redirect_evidence",
-    "situation": "下载经过镜像跳转",
-    "observable": "判断与实际资源绑定而非仅初始链接"
+    "name": "reference_before_object",
+    "situation": "引用先于对象详情",
+    "observable": "待补关系不冒充完整正文"
   }
 ]

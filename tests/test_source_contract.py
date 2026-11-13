@@ -13,12 +13,11 @@ class SourceContractTests(unittest.TestCase):
         records = scenario["source_records"]
         with serve(scenario) as origin:
             client = Client(origin.base_url)
-            self.assertNotIn("commercial", records[0]["purpose"])
-            self.assertIn("commercial", records[1]["purpose"])
-            self.assertNotEqual(records[0]["rendition"], records[1]["rendition"])
-            response = client.fetch(records[2]["href"])
-            self.assertTrue(response.url.endswith("/assets/original"))
-            self.assertEqual(response.body, b"synthetic-original")
+            create, announce, undo = [record["activity"] for record in records]
+            self.assertEqual(announce["object"], create["object"]["id"])
+            self.assertEqual(undo["object"], announce["id"])
+            self.assertNotEqual(announce["actor"], create["actor"])
+            self.assertEqual(undo["type"], "Undo")
 
     def test_every_record_has_the_declared_source_identity(self):
         scenario = load_scenario()
