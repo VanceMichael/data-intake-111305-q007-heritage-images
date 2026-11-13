@@ -1,0 +1,140 @@
+{
+  "identity_fields": [
+    "collection",
+    "asset"
+  ],
+  "source_records": [
+    {
+      "collection": "museum-a",
+      "asset": "painting-7-original",
+      "purpose": [
+        "research"
+      ],
+      "valid_until": "2026-11-11T00:00:00Z",
+      "href": "/assets/original",
+      "rendition": "original"
+    },
+    {
+      "collection": "museum-a",
+      "asset": "painting-7-thumb",
+      "purpose": [
+        "research",
+        "commercial"
+      ],
+      "valid_until": null,
+      "href": "/assets/thumb",
+      "rendition": "thumbnail"
+    },
+    {
+      "collection": "museum-b",
+      "asset": "photo-3",
+      "purpose": null,
+      "href": "/redirect/asset",
+      "rendition": "original"
+    }
+  ],
+  "portal": {
+    "csrf": "form-2026-b"
+  },
+  "routes": {
+    "/feed": {
+      "body": "<!doctype html><html lang='zh'><meta charset='utf-8'><title>来源目录</title><body>\n<article><h2>来源记录</h2>\n<dl><dt>collection</dt><dd>museum-a</dd><dt>asset</dt><dd>painting-7-original</dd><dt>purpose</dt><dd>[&#x27;research&#x27;]</dd><dt>valid_until</dt><dd>2026-11-11T00:00:00Z</dd><dt>href</dt><dd>/assets/original</dd><dt>rendition</dt><dd>original</dd></dl>\n</article>\n<article><h2>来源记录</h2>\n<dl><dt>collection</dt><dd>museum-a</dd><dt>asset</dt><dd>painting-7-thumb</dd><dt>purpose</dt><dd>[&#x27;research&#x27;, &#x27;commercial&#x27;]</dd><dt>valid_until</dt><dd>None</dd><dt>href</dt><dd>/assets/thumb</dd><dt>rendition</dt><dd>thumbnail</dd></dl>\n</article>\n<article><h2>来源记录</h2>\n<dl><dt>collection</dt><dd>museum-b</dd><dt>asset</dt><dd>photo-3</dd><dt>purpose</dt><dd>None</dd><dt>href</dt><dd>/redirect/asset</dd><dt>rendition</dt><dd>original</dd></dl>\n</article>\n<script type=\"application/json\" id=\"source-records\">[{\"collection\": \"museum-a\", \"asset\": \"painting-7-original\", \"purpose\": [\"research\"], \"valid_until\": \"2026-11-11T00:00:00Z\", \"href\": \"/assets/original\", \"rendition\": \"original\"}, {\"collection\": \"museum-a\", \"asset\": \"painting-7-thumb\", \"purpose\": [\"research\", \"commercial\"], \"valid_until\": null, \"href\": \"/assets/thumb\", \"rendition\": \"thumbnail\"}, {\"collection\": \"museum-b\", \"asset\": \"photo-3\", \"purpose\": null, \"href\": \"/redirect/asset\", \"rendition\": \"original\"}]</script></body></html>",
+      "content_type": "text/html; charset=utf-8",
+      "headers": {
+        "ETag": "feed-1"
+      }
+    },
+    "/rate-limited": {
+      "status": 429,
+      "headers": {
+        "Retry-After": "2"
+      },
+      "json": {
+        "error": "quota"
+      }
+    },
+    "/unstable": [
+      {
+        "status": 503,
+        "body": "temporarily unavailable"
+      },
+      {
+        "json": {
+          "items": []
+        }
+      }
+    ],
+    "/range": {
+      "body": "0123456789",
+      "range": true
+    },
+    "/range-ignored": {
+      "body": "0123456789"
+    },
+    "/truncated": {
+      "body": "partial",
+      "truncate": true
+    },
+    "/assets/original": {
+      "body": "synthetic-original",
+      "content_type": "image/x-synthetic"
+    },
+    "/assets/thumb": {
+      "body": "synthetic-thumbnail",
+      "content_type": "image/x-synthetic"
+    },
+    "/redirect/asset": {
+      "status": 302,
+      "headers": {
+        "Location": "/assets/original"
+      },
+      "body": ""
+    },
+    "/observations/1": {
+      "json": {
+        "items": [
+          {
+            "collection": "museum-a",
+            "asset": "painting-7-original",
+            "purpose": [
+              "research"
+            ],
+            "valid_until": "2026-11-11T00:00:00Z",
+            "href": "/assets/original",
+            "rendition": "original"
+          }
+        ]
+      }
+    },
+    "/observations/2": {
+      "json": {
+        "items": [
+          {
+            "collection": "museum-a",
+            "asset": "painting-7-thumb",
+            "purpose": [
+              "research",
+              "commercial"
+            ],
+            "valid_until": null,
+            "href": "/assets/thumb",
+            "rendition": "thumbnail"
+          }
+        ]
+      }
+    },
+    "/observations/3": {
+      "json": {
+        "items": [
+          {
+            "collection": "museum-b",
+            "asset": "photo-3",
+            "purpose": null,
+            "href": "/redirect/asset",
+            "rendition": "original"
+          }
+        ]
+      }
+    }
+  }
+}

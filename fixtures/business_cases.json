@@ -1,0 +1,17 @@
+[
+  {
+    "name": "revocation_during_handoff",
+    "situation": "许可检查后撤权并交接",
+    "observable": "过时领取不继续下载"
+  },
+  {
+    "name": "rendition_scope",
+    "situation": "缩略图与原图权限不同",
+    "observable": "不借缩略图许可放行原图"
+  },
+  {
+    "name": "redirect_evidence",
+    "situation": "下载经过镜像跳转",
+    "observable": "判断与实际资源绑定而非仅初始链接"
+  }
+]
