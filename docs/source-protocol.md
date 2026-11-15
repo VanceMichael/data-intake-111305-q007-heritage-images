@@ -6,6 +6,8 @@
 
 `/observations/1` 等地址允许逐条读取合成观察，返回 `items` 数组。正文、页内嵌入数据与CSV均保留供方原文，不在协议层推断当前有效值。网页中的 `source-records` 是门户向下载客户端提供的公开数据块；表单还带有隐藏控件，令牌用于本地协议状态检查。
 
+路由除了内联响应，也可以引用 `source_records`：`{"record": 序号}` 返回单条观察，`{"records": "all"}` 返回全部观察。`fixtures/domain_origin.json` 用这种方式把 16 条观察同时暴露为 `/feed` 与 `/observations/1` 到 `/observations/16`，供领域演练按任意次序拉取。
+
 ## 传输响应
 
 `/feed` 有 ETag `feed-1`，可发送 `If-None-Match` 得到304。`/rate-limited` 返回429和两秒的Retry-After；`/unstable` 首次503，其后200；`/truncated` 声明长度大于实际传送长度并断开。`/range` 支持单段字节范围及416，`/range-ignored` 故意返回整份200，不能假定所有供方都会履行范围请求。
@@ -22,6 +24,8 @@
 - `untrusted_delete`：另一账号转来删除声明；业务侧关注核对归属而不直接抹除。
 - `reference_before_object`：引用先于对象详情；业务侧关注待补关系不冒充完整正文。
 
+`fixtures/business_cases.json` 还列有撤销先于转发到达、重复活动、删除后晚到引用、私有收件对象、未配置来源、网关转寄删除与源站失联等交错情况；`fixtures/domain_origin.json` 按序覆盖全部情况。
+
 ## 领域接入契约
 
-activity 内层采用 W3C ActivityPub/ActivityStreams 的公开活动子集，外层 source、observation 是合作网关信封。合作源与actor的对应关系由本地配置确定，不凭活动自报身份建立信任。只读采集，不发送任何活动，不执行远端上下文或抓取未配置域。
+activity 内层采用 W3C ActivityPub/ActivityStreams 的公开活动子集，外层 source、observation 是合作网关信封。合作源与actor的对应关系由本地配置确定，不凭活动自报身份建立信任。只读采集，不发送任何活动，不执行远端上下文或抓取未配置域。处理规则与视图口径见 `docs/domain-model.md`。

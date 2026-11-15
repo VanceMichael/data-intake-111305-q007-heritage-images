@@ -1,6 +1,6 @@
 # 合作馆 ActivityPub 公共动态的对象级采集
 
-这是资料接收程序的基础版。它请求来源接口，保留响应状态、头部、原始内容与每次观察的时间，能够从 JSON、CSV 或门户嵌入的数据块读回来源记录。当前不生成面向业务的有效版本，也不自动执行门户提交；重复观察会分别保留，原始内容按摘要复用。
+资料接收程序分两层：原始接收层请求来源接口，保留响应状态、头部、原始内容与每次观察的时间，能够从 JSON、CSV 或门户嵌入的数据块读回来源记录；领域层把合作馆公开的 ActivityPub 活动解释成对象与展示关系。归档库只追加来源观察，不用最后一条响应覆盖先前响应；重复观察分别保留，原始内容按摘要复用。当前不自动执行门户提交。
 
 ## 运行环境
 
@@ -17,9 +17,10 @@ python3 -m unittest discover -s tests -v
 python3 -m build --wheel --no-isolation
 python3 -m compileall -q heritage_images tests
 python3 -m heritage_images demo
+python3 -m heritage_images drill
 ```
 
-演示从空的临时目录启动本地来源，真实完成一次 HTTP 获取及归档，并输出原样记录；结束自动清理。本地测试、编译和演示合计一般不超过十秒，可直接展示，不依赖历史日志。
+`demo` 从空的临时目录启动本地来源，真实完成一次 HTTP 获取及归档，并输出原样记录。`drill` 启动领域演练场景，完成捕获、采集并输出资料员视图。两者结束都自动清理。本地测试、编译和演示合计一般不超过十秒，可直接展示，不依赖历史日志。
 
 ## 常驻来源与接收
 
@@ -35,10 +36,20 @@ python3 -m heritage_images capture --base-url http://127.0.0.1:实际端口 --ar
 
 归档库只追加来源观察，不用最后一条响应覆盖先前响应。`archive.py` 管理原始内容及完整性，`client.py` 执行一次请求，`decoding.py` 负责来源格式解码，`origin.py` 提供协议演练。业务解释可与原始接收独立演进。
 
+## 领域采集（只读）
+
+```sh
+python3 -m heritage_images ingest --archive .runtime/raw.sqlite3 --domain .runtime/domain.sqlite3 --partners fixtures/partners.json
+python3 -m heritage_images view --domain .runtime/domain.sqlite3 --source museum-a
+python3 -m heritage_images events --domain .runtime/domain.sqlite3
+```
+
+`domain.py` 把活动身份、对象身份和账号对对象的展示关系分开保存：活动逐条记入事件依据，对象记录当前状态，Announce 建立展示关系，Undo 只撤关系不删对象，Delete 必须核对可信来源与对象归属。信任只来自 `--partners` 指定的本地配置（缺省用随包的合成配置），只采明确公开的活动；不抓取对象 URL，也不抓取远端 JSON-LD 上下文。缺少对象详情时关系保持待补，重复活动、晚到旧引用和源站短时失联都不会恢复已确认撤回的展示。`view` 按馆方列出当前可展示的对象和转发关系，每项都带事件依据序号；`events` 输出全部处理结论。详细规则见 `docs/domain-model.md`。
+
 ## 开发资料
 
-来源协议见 `docs/source-protocol.md`，领域观察关系见 `tests/test_source_contract.py`。`fixtures/business_cases.json` 保存业务侧关注的交错情况及可观察口径；基础版测试验证的是原始采集和协议，不代表业务处理已经具备这些能力。所有条目、机构、文件内容和门户回执均为本地合成资料，不包含真实用户身份。
+来源协议见 `docs/source-protocol.md`，领域模型见 `docs/domain-model.md`，领域观察关系见 `tests/test_source_contract.py`。`fixtures/business_cases.json` 保存业务侧关注的交错情况及可观察口径；`fixtures/domain_origin.json` 是覆盖这些交错的演练场景，`fixtures/partners.json` 是配套的合成合作方配置。所有条目、机构、文件内容和门户回执均为本地合成资料，不包含真实用户身份。
 
 ## Wheel 分发
 
-构建产物位于 `dist/`，包含 `heritage_images` 和命名空间内的合成来源 JSON。安装 wheel 后，即使当前目录不是源码目录，也可执行 `python3 -m heritage_images demo`。提供 `serve --scenario` 时仍以指定文件为准，找不到指定文件会直接报错，不回退到默认资料。
+构建产物位于 `dist/`，包含 `heritage_images` 和命名空间内的合成来源 JSON。安装 wheel 后，即使当前目录不是源码目录，也可执行 `python3 -m heritage_images demo` 与 `python3 -m heritage_images drill`。提供 `serve --scenario` 时仍以指定文件为准，找不到指定文件会直接报错，不回退到默认资料。

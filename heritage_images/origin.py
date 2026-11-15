@@ -6,14 +6,11 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
+from . import fixture_path
+
 
 def load_scenario(path=None):
-    if path is not None:
-        scenario = Path(path)
-    else:
-        scenario = Path(__file__).parent / "fixtures" / "origin.json"
-        if not scenario.is_file():
-            scenario = Path(__file__).parents[1] / "fixtures" / "origin.json"
+    scenario = Path(path) if path is not None else fixture_path("origin.json")
     return json.loads(scenario.read_text(encoding="utf-8"))
 
 
@@ -67,6 +64,18 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 selected = choices
             selected = copy.deepcopy(selected)
+            if "record" in selected or "records" in selected:
+                pool = self.server.scenario.get("source_records", [])
+                if "record" in selected:
+                    index = selected.pop("record")
+                    items = [pool[index]] if isinstance(index, int) and 0 <= index < len(pool) else None
+                else:
+                    selected.pop("records")
+                    items = pool
+                if items is None:
+                    selected = {"status": 404, "body": "unknown record"}
+                else:
+                    selected["json"] = {"items": copy.deepcopy(items)}
         if "json" in selected:
             body = json.dumps(selected["json"], ensure_ascii=False).encode()
             content_type = "application/json"

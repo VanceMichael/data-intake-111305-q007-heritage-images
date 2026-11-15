@@ -1,0 +1,14 @@
+{
+  "partners": [
+    {
+      "source": "museum-a",
+      "actor": "https://museum-a.invalid/actors/main",
+      "name": "合成馆甲"
+    },
+    {
+      "source": "museum-b",
+      "actor": "https://museum-b.invalid/actors/main",
+      "name": "合成馆乙"
+    }
+  ]
+}

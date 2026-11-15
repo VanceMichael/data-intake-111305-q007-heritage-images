@@ -13,5 +13,40 @@
     "name": "reference_before_object",
     "situation": "引用先于对象详情",
     "observable": "待补关系不冒充完整正文"
+  },
+  {
+    "name": "late_reference_after_undo",
+    "situation": "撤销先于转发到达，或旧引用晚到",
+    "observable": "已确认撤回的展示不恢复"
+  },
+  {
+    "name": "duplicate_activity",
+    "situation": "同一活动重复到达",
+    "observable": "按活动身份幂等，不重复建立关系"
+  },
+  {
+    "name": "owner_delete_then_reference",
+    "situation": "原作者删除后仍有引用到达",
+    "observable": "对象保持已删除，新引用关系不可展示"
+  },
+  {
+    "name": "private_audience",
+    "situation": "收件对象只有私有集合的活动",
+    "observable": "非公开内容不采集"
+  },
+  {
+    "name": "unconfigured_source",
+    "situation": "未配置来源投递的活动",
+    "observable": "不信任，不采集"
+  },
+  {
+    "name": "gateway_relayed_delete",
+    "situation": "网关转来他方账号的删除声明",
+    "observable": "actor 与来源配置不符，拒绝且原文保留"
+  },
+  {
+    "name": "source_outage",
+    "situation": "源站短时失联",
+    "observable": "失败观察只记录，不改变可展示状态"
   }
 ]

@@ -1,0 +1,289 @@
+{
+  "identity_fields": [
+    "source",
+    "observation"
+  ],
+  "source_records": [
+    {
+      "source": "museum-a",
+      "observation": 1,
+      "activity": {
+        "@context": [
+          "https://www.w3.org/ns/activitystreams",
+          "https://remote-context.invalid/ld.json"
+        ],
+        "id": "https://museum-a.invalid/a/1",
+        "type": "Create",
+        "actor": "https://museum-a.invalid/actors/main",
+        "object": {
+          "id": "https://museum-a.invalid/objects/7",
+          "type": "Note",
+          "attributedTo": "https://museum-a.invalid/actors/main",
+          "content": "合成展览动态"
+        },
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ]
+      }
+    },
+    {
+      "source": "museum-b",
+      "observation": 2,
+      "activity": {
+        "id": "https://museum-b.invalid/a/8",
+        "type": "Announce",
+        "actor": "https://museum-b.invalid/actors/main",
+        "object": "https://museum-a.invalid/objects/7",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ]
+      }
+    },
+    {
+      "source": "museum-b",
+      "observation": 3,
+      "activity": {
+        "id": "https://museum-b.invalid/a/9",
+        "type": "Undo",
+        "actor": "https://museum-b.invalid/actors/main",
+        "object": "https://museum-b.invalid/a/8"
+      }
+    },
+    {
+      "source": "museum-b",
+      "observation": 4,
+      "activity": {
+        "id": "https://museum-b.invalid/a/10",
+        "type": "Delete",
+        "actor": "https://museum-b.invalid/actors/main",
+        "object": "https://museum-a.invalid/objects/7"
+      }
+    },
+    {
+      "source": "museum-b",
+      "observation": 5,
+      "activity": {
+        "id": "https://museum-b.invalid/a/11",
+        "type": "Announce",
+        "actor": "https://museum-b.invalid/actors/main",
+        "object": "https://museum-a.invalid/objects/9",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ]
+      }
+    },
+    {
+      "source": "museum-a",
+      "observation": 6,
+      "activity": {
+        "id": "https://museum-a.invalid/a/12",
+        "type": "Create",
+        "actor": "https://museum-a.invalid/actors/main",
+        "object": {
+          "id": "https://museum-a.invalid/objects/9",
+          "type": "Note",
+          "attributedTo": "https://museum-a.invalid/actors/main",
+          "content": "合成夜场导览"
+        },
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ]
+      }
+    },
+    {
+      "source": "museum-a",
+      "observation": 7,
+      "activity": {
+        "id": "https://museum-a.invalid/a/13",
+        "type": "Update",
+        "actor": "https://museum-a.invalid/actors/main",
+        "object": "https://museum-a.invalid/objects/9",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ]
+      }
+    },
+    {
+      "source": "museum-a",
+      "observation": 8,
+      "activity": {
+        "id": "https://museum-a.invalid/a/14",
+        "type": "Update",
+        "actor": "https://museum-a.invalid/actors/main",
+        "object": {
+          "id": "https://museum-a.invalid/objects/9",
+          "type": "Note",
+          "attributedTo": "https://museum-a.invalid/actors/main",
+          "content": "合成夜场导览（修订）"
+        },
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ]
+      }
+    },
+    {
+      "source": "museum-b",
+      "observation": 9,
+      "activity": {
+        "id": "https://museum-b.invalid/a/15",
+        "type": "Undo",
+        "actor": "https://museum-b.invalid/actors/main",
+        "object": "https://museum-b.invalid/a/16"
+      }
+    },
+    {
+      "source": "museum-b",
+      "observation": 10,
+      "activity": {
+        "id": "https://museum-b.invalid/a/16",
+        "type": "Announce",
+        "actor": "https://museum-b.invalid/actors/main",
+        "object": "https://museum-a.invalid/objects/7",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ]
+      }
+    },
+    {
+      "source": "museum-b",
+      "observation": 11,
+      "activity": {
+        "id": "https://museum-b.invalid/a/8",
+        "type": "Announce",
+        "actor": "https://museum-b.invalid/actors/main",
+        "object": "https://museum-a.invalid/objects/7",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ]
+      }
+    },
+    {
+      "source": "museum-a",
+      "observation": 12,
+      "activity": {
+        "id": "https://museum-a.invalid/a/17",
+        "type": "Delete",
+        "actor": "https://museum-a.invalid/actors/main",
+        "object": "https://museum-a.invalid/objects/7"
+      }
+    },
+    {
+      "source": "museum-b",
+      "observation": 13,
+      "activity": {
+        "id": "https://museum-b.invalid/a/18",
+        "type": "Announce",
+        "actor": "https://museum-b.invalid/actors/main",
+        "object": "https://museum-a.invalid/objects/7",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ]
+      }
+    },
+    {
+      "source": "museum-a",
+      "observation": 14,
+      "activity": {
+        "id": "https://museum-a.invalid/a/19",
+        "type": "Create",
+        "actor": "https://museum-a.invalid/actors/main",
+        "object": {
+          "id": "https://museum-a.invalid/objects/20",
+          "type": "Note",
+          "attributedTo": "https://museum-a.invalid/actors/main",
+          "content": "内部布展备忘"
+        },
+        "to": [
+          "https://museum-a.invalid/collections/staff"
+        ]
+      }
+    },
+    {
+      "source": "museum-c",
+      "observation": 15,
+      "activity": {
+        "id": "https://museum-c.invalid/a/21",
+        "type": "Create",
+        "actor": "https://museum-c.invalid/actors/main",
+        "object": {
+          "id": "https://museum-c.invalid/objects/22",
+          "type": "Note",
+          "attributedTo": "https://museum-c.invalid/actors/main",
+          "content": "未配置馆动态"
+        },
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ]
+      }
+    },
+    {
+      "source": "museum-b",
+      "observation": 16,
+      "activity": {
+        "id": "https://museum-b.invalid/a/23",
+        "type": "Delete",
+        "actor": "https://museum-a.invalid/actors/main",
+        "object": "https://museum-a.invalid/objects/9"
+      }
+    }
+  ],
+  "portal": {
+    "csrf": "domain-form"
+  },
+  "routes": {
+    "/feed": {
+      "records": "all",
+      "headers": {
+        "ETag": "domain-feed-1"
+      }
+    },
+    "/observations/1": {
+      "record": 0
+    },
+    "/observations/2": {
+      "record": 1
+    },
+    "/observations/3": {
+      "record": 2
+    },
+    "/observations/4": {
+      "record": 3
+    },
+    "/observations/5": {
+      "record": 4
+    },
+    "/observations/6": {
+      "record": 5
+    },
+    "/observations/7": {
+      "record": 6
+    },
+    "/observations/8": {
+      "record": 7
+    },
+    "/observations/9": {
+      "record": 8
+    },
+    "/observations/10": {
+      "record": 9
+    },
+    "/observations/11": {
+      "record": 10
+    },
+    "/observations/12": {
+      "record": 11
+    },
+    "/observations/13": {
+      "record": 12
+    },
+    "/observations/14": {
+      "record": 13
+    },
+    "/observations/15": {
+      "record": 14
+    },
+    "/observations/16": {
+      "record": 15
+    }
+  }
+}

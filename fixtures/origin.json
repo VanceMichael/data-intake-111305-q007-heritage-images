@@ -29,7 +29,10 @@
         "id": "https://museum-b.invalid/a/8",
         "type": "Announce",
         "actor": "https://museum-b.invalid/actors/main",
-        "object": "https://museum-a.invalid/objects/7"
+        "object": "https://museum-a.invalid/objects/7",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ]
       }
     },
     {
@@ -75,7 +78,10 @@
               "id": "https://museum-b.invalid/a/8",
               "type": "Announce",
               "actor": "https://museum-b.invalid/actors/main",
-              "object": "https://museum-a.invalid/objects/7"
+              "object": "https://museum-a.invalid/objects/7",
+              "to": [
+                "https://www.w3.org/ns/activitystreams#Public"
+              ]
             }
           },
           {
@@ -159,7 +165,10 @@
               "id": "https://museum-b.invalid/a/8",
               "type": "Announce",
               "actor": "https://museum-b.invalid/actors/main",
-              "object": "https://museum-a.invalid/objects/7"
+              "object": "https://museum-a.invalid/objects/7",
+              "to": [
+                "https://www.w3.org/ns/activitystreams#Public"
+              ]
             }
           }
         ]
