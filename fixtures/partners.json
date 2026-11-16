@@ -1,0 +1,16 @@
+{
+  "partners": [
+    {
+      "source": "museum-a",
+      "name": "合成馆A（原作者）",
+      "actors": ["https://museum-a.invalid/actors/main"],
+      "domains": ["museum-a.invalid"]
+    },
+    {
+      "source": "museum-b",
+      "name": "合成馆B（转发合作方）",
+      "actors": ["https://museum-b.invalid/actors/main"],
+      "domains": ["museum-b.invalid"]
+    }
+  ]
+}

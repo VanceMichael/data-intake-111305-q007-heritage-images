@@ -18,10 +18,22 @@
 
 ## 领域样例
 
-- `undo_announce`：取消转发且原作者内容仍存在；业务侧关注只撤展示关系，不删原对象。
-- `untrusted_delete`：另一账号转来删除声明；业务侧关注核对归属而不直接抹除。
-- `reference_before_object`：引用先于对象详情；业务侧关注待补关系不冒充完整正文。
+`fixtures/federation_cases.json` 逐条保存下列交错情况的合成信封与可观察口径，
+由 `tests/test_federation.py` 按用例独立核对；对象级解释规则见
+`docs/federation-collection.md`。
+
+- `undo_announce`：取消转发且原作者内容仍存在；只撤展示关系，不删原对象。
+- `untrusted_delete`：另一账号转来删除声明；核对来源与对象归属，不直接抹除。
+- `reference_before_object`：引用先于对象详情；待补关系不冒充完整正文。
+- `out_of_order_update`：Update 与引用乱序，非属主改稿被拒。
+- `verified_delete_and_tombstone`：属主删除后晚到旧稿、旧转发均不能复活展示。
+- `private_addressing_rejected`：定向与盲收件不采集。
+- `unconfigured_source_and_actor`：未配置合作方、冒名 actor 不建立信任。
+- `remote_context_and_foreign_domain`：远端上下文不抓取，未配置域对象不展示。
+- `duplicates_do_not_revive`：重复活动与晚到旧引用不能恢复已确认撤回。
+- `delete_with_unknown_ownership_retained`：归属未知时删除声明不足为凭。
+- `undo_before_announce_and_cross_actor_undo`：Undo 早到挂起、跨账号撤销被拒。
 
 ## 领域接入契约
 
-activity 内层采用 W3C ActivityPub/ActivityStreams 的公开活动子集，外层 source、observation 是合作网关信封。合作源与actor的对应关系由本地配置确定，不凭活动自报身份建立信任。只读采集，不发送任何活动，不执行远端上下文或抓取未配置域。
+activity 内层采用 W3C ActivityPub/ActivityStreams 的公开活动子集，外层 source、observation 是合作网关信封。合作源与actor的对应关系由本地 `fixtures/partners.json` 确定，不凭活动自报身份建立信任。只读采集，不发送任何活动，不执行远端 `@context` 或抓取未配置域；对象详情缺失时只登记待补占位，绝不把引用 URL 当作正文。

@@ -1,0 +1,665 @@
+{
+  "public_collection": "https://www.w3.org/ns/activitystreams#Public",
+  "cases": [
+    {
+      "name": "undo_announce",
+      "situation": "取消转发且原作者内容仍存在",
+      "observable": "只撤展示关系，不删原对象",
+      "envelopes": [
+        {
+          "source": "museum-a",
+          "observation": "u1",
+          "activity": {
+            "id": "https://museum-a.invalid/a/1",
+            "type": "Create",
+            "actor": "https://museum-a.invalid/actors/main",
+            "object": {
+              "id": "https://museum-a.invalid/objects/7",
+              "type": "Note",
+              "attributedTo": "https://museum-a.invalid/actors/main",
+              "content": "合成展览动态",
+              "to": ["https://www.w3.org/ns/activitystreams#Public"]
+            },
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-b",
+          "observation": "u2",
+          "activity": {
+            "id": "https://museum-b.invalid/a/8",
+            "type": "Announce",
+            "actor": "https://museum-b.invalid/actors/main",
+            "object": "https://museum-a.invalid/objects/7",
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-b",
+          "observation": "u3",
+          "activity": {
+            "id": "https://museum-b.invalid/a/9",
+            "type": "Undo",
+            "actor": "https://museum-b.invalid/actors/main",
+            "object": "https://museum-b.invalid/a/8"
+          }
+        }
+      ],
+      "expected": {
+        "decisions": ["applied", "applied", "applied"],
+        "reasons": ["object_details_recorded", "share_recorded", "share_withdrawn"],
+        "visible_object_ids": ["https://museum-a.invalid/objects/7"],
+        "tombstoned_object_ids": [],
+        "active_share_activity_ids": [],
+        "withdrawn_share_activity_ids": ["https://museum-b.invalid/a/8"],
+        "pending_object_ids": []
+      }
+    },
+    {
+      "name": "untrusted_delete",
+      "situation": "另一账号转来删除声明",
+      "observable": "核对归属而不直接抹除",
+      "envelopes": [
+        {
+          "source": "museum-a",
+          "observation": "d1",
+          "activity": {
+            "id": "https://museum-a.invalid/a/11",
+            "type": "Create",
+            "actor": "https://museum-a.invalid/actors/main",
+            "object": {
+              "id": "https://museum-a.invalid/objects/12",
+              "type": "Note",
+              "attributedTo": "https://museum-a.invalid/actors/main",
+              "content": "待保护的原帖",
+              "to": ["https://www.w3.org/ns/activitystreams#Public"]
+            },
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-b",
+          "observation": "d2",
+          "activity": {
+            "id": "https://museum-b.invalid/a/13",
+            "type": "Delete",
+            "actor": "https://museum-b.invalid/actors/main",
+            "object": "https://museum-a.invalid/objects/12",
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        }
+      ],
+      "expected": {
+        "decisions": ["applied", "rejected"],
+        "reasons": ["object_details_recorded", "actor_is_not_object_owner"],
+        "visible_object_ids": ["https://museum-a.invalid/objects/12"],
+        "tombstoned_object_ids": [],
+        "active_share_activity_ids": [],
+        "withdrawn_share_activity_ids": [],
+        "pending_object_ids": []
+      }
+    },
+    {
+      "name": "reference_before_object",
+      "situation": "引用先于对象详情",
+      "observable": "待补关系不冒充完整正文",
+      "envelopes": [
+        {
+          "source": "museum-b",
+          "observation": "r1",
+          "activity": {
+            "id": "https://museum-b.invalid/a/19",
+            "type": "Announce",
+            "actor": "https://museum-b.invalid/actors/main",
+            "object": "https://museum-a.invalid/objects/20",
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-a",
+          "observation": "r2",
+          "activity": {
+            "id": "https://museum-a.invalid/a/21",
+            "type": "Create",
+            "actor": "https://museum-a.invalid/actors/main",
+            "object": {
+              "id": "https://museum-a.invalid/objects/20",
+              "type": "Note",
+              "attributedTo": "https://museum-a.invalid/actors/main",
+              "content": "晚到的对象详情",
+              "to": ["https://www.w3.org/ns/activitystreams#Public"]
+            },
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        }
+      ],
+      "expected": {
+        "decisions": ["pending", "applied"],
+        "reasons": ["object_details_missing", "object_details_recorded"],
+        "visible_object_ids": ["https://museum-a.invalid/objects/20"],
+        "tombstoned_object_ids": [],
+        "active_share_activity_ids": ["https://museum-b.invalid/a/19"],
+        "withdrawn_share_activity_ids": [],
+        "pending_object_ids": []
+      }
+    },
+    {
+      "name": "out_of_order_update",
+      "situation": "原帖 Update 与引用乱序，且非属主不能改稿",
+      "observable": "缺详情时挂起待补，归属不符的更新被拒",
+      "envelopes": [
+        {
+          "source": "museum-a",
+          "observation": "o1",
+          "activity": {
+            "id": "https://museum-a.invalid/a/29",
+            "type": "Update",
+            "actor": "https://museum-a.invalid/actors/main",
+            "object": "https://museum-a.invalid/objects/30",
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-a",
+          "observation": "o2",
+          "activity": {
+            "id": "https://museum-a.invalid/a/31",
+            "type": "Create",
+            "actor": "https://museum-a.invalid/actors/main",
+            "object": {
+              "id": "https://museum-a.invalid/objects/30",
+              "type": "Note",
+              "attributedTo": "https://museum-a.invalid/actors/main",
+              "content": "初版正文",
+              "to": ["https://www.w3.org/ns/activitystreams#Public"]
+            },
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-a",
+          "observation": "o3",
+          "activity": {
+            "id": "https://museum-a.invalid/a/32",
+            "type": "Update",
+            "actor": "https://museum-a.invalid/actors/main",
+            "object": {
+              "id": "https://museum-a.invalid/objects/30",
+              "type": "Note",
+              "attributedTo": "https://museum-a.invalid/actors/main",
+              "content": "修订版正文",
+              "to": ["https://www.w3.org/ns/activitystreams#Public"]
+            },
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-b",
+          "observation": "o4",
+          "activity": {
+            "id": "https://museum-b.invalid/a/33",
+            "type": "Update",
+            "actor": "https://museum-b.invalid/actors/main",
+            "object": {
+              "id": "https://museum-a.invalid/objects/30",
+              "type": "Note",
+              "attributedTo": "https://museum-a.invalid/actors/main",
+              "content": "外馆篡改稿",
+              "to": ["https://www.w3.org/ns/activitystreams#Public"]
+            },
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        }
+      ],
+      "expected": {
+        "decisions": ["pending", "applied", "applied", "rejected"],
+        "reasons": [
+          "object_details_missing",
+          "object_details_recorded",
+          "object_details_recorded",
+          "actor_is_not_object_owner"
+        ],
+        "visible_object_ids": ["https://museum-a.invalid/objects/30"],
+        "tombstoned_object_ids": [],
+        "active_share_activity_ids": [],
+        "withdrawn_share_activity_ids": [],
+        "pending_object_ids": [],
+        "final_content": "修订版正文"
+      }
+    },
+    {
+      "name": "verified_delete_and_tombstone",
+      "situation": "属主核对通过的删除，晚到旧稿不能复活",
+      "observable": "对象标记墓碑并停展全部转发，后续 Create/Announce 不恢复",
+      "envelopes": [
+        {
+          "source": "museum-a",
+          "observation": "t1",
+          "activity": {
+            "id": "https://museum-a.invalid/a/39",
+            "type": "Create",
+            "actor": "https://museum-a.invalid/actors/main",
+            "object": {
+              "id": "https://museum-a.invalid/objects/40",
+              "type": "Note",
+              "attributedTo": "https://museum-a.invalid/actors/main",
+              "content": "将被撤回的稿件",
+              "to": ["https://www.w3.org/ns/activitystreams#Public"]
+            },
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-b",
+          "observation": "t2",
+          "activity": {
+            "id": "https://museum-b.invalid/a/41",
+            "type": "Announce",
+            "actor": "https://museum-b.invalid/actors/main",
+            "object": "https://museum-a.invalid/objects/40",
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-a",
+          "observation": "t3",
+          "activity": {
+            "id": "https://museum-a.invalid/a/42",
+            "type": "Delete",
+            "actor": "https://museum-a.invalid/actors/main",
+            "object": {
+              "id": "https://museum-a.invalid/objects/40",
+              "type": "Tombstone"
+            },
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-a",
+          "observation": "t4",
+          "activity": {
+            "id": "https://museum-a.invalid/a/43",
+            "type": "Create",
+            "actor": "https://museum-a.invalid/actors/main",
+            "object": {
+              "id": "https://museum-a.invalid/objects/40",
+              "type": "Note",
+              "attributedTo": "https://museum-a.invalid/actors/main",
+              "content": "晚到的旧稿",
+              "to": ["https://www.w3.org/ns/activitystreams#Public"]
+            },
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-b",
+          "observation": "t5",
+          "activity": {
+            "id": "https://museum-b.invalid/a/44",
+            "type": "Announce",
+            "actor": "https://museum-b.invalid/actors/main",
+            "object": "https://museum-a.invalid/objects/40",
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        }
+      ],
+      "expected": {
+        "decisions": ["applied", "applied", "applied", "rejected", "applied"],
+        "reasons": [
+          "object_details_recorded",
+          "share_recorded",
+          "object_tombstoned_by_owner",
+          "object_already_tombstoned",
+          "share_hidden_object_deleted"
+        ],
+        "visible_object_ids": [],
+        "tombstoned_object_ids": ["https://museum-a.invalid/objects/40"],
+        "active_share_activity_ids": [],
+        "withdrawn_share_activity_ids": [],
+        "tombstone_hidden_share_activity_ids": [
+          "https://museum-b.invalid/a/41",
+          "https://museum-b.invalid/a/44"
+        ],
+        "pending_object_ids": []
+      }
+    },
+    {
+      "name": "private_addressing_rejected",
+      "situation": "私有收件与盲收件不采集",
+      "observable": "只收公开内容，对象不入库",
+      "envelopes": [
+        {
+          "source": "museum-a",
+          "observation": "p1",
+          "activity": {
+            "id": "https://museum-a.invalid/a/50",
+            "type": "Create",
+            "actor": "https://museum-a.invalid/actors/main",
+            "object": {
+              "id": "https://museum-a.invalid/objects/51",
+              "type": "Note",
+              "attributedTo": "https://museum-a.invalid/actors/main",
+              "content": "定向私信",
+              "to": ["https://museum-b.invalid/actors/main"]
+            },
+            "to": ["https://museum-b.invalid/actors/main"]
+          }
+        },
+        {
+          "source": "museum-a",
+          "observation": "p2",
+          "activity": {
+            "id": "https://museum-a.invalid/a/52",
+            "type": "Create",
+            "actor": "https://museum-a.invalid/actors/main",
+            "object": {
+              "id": "https://museum-a.invalid/objects/53",
+              "type": "Note",
+              "attributedTo": "https://museum-a.invalid/actors/main",
+              "content": "盲收件动态",
+              "bto": ["https://museum-b.invalid/actors/main"]
+            },
+            "bto": ["https://museum-b.invalid/actors/main"]
+          }
+        }
+      ],
+      "expected": {
+        "decisions": ["rejected", "rejected"],
+        "reasons": ["non_public_addressing", "non_public_addressing"],
+        "visible_object_ids": [],
+        "tombstoned_object_ids": [],
+        "active_share_activity_ids": [],
+        "withdrawn_share_activity_ids": [],
+        "pending_object_ids": []
+      }
+    },
+    {
+      "name": "unconfigured_source_and_actor",
+      "situation": "未配置合作方与冒名 actor 不建立信任",
+      "observable": "信任只来自本地名录，不凭活动自报",
+      "envelopes": [
+        {
+          "source": "museum-x",
+          "observation": "x1",
+          "activity": {
+            "id": "https://museum-x.invalid/a/1",
+            "type": "Create",
+            "actor": "https://museum-x.invalid/actors/main",
+            "object": {"id": "https://museum-x.invalid/o/1", "type": "Note"},
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-a",
+          "observation": "x2",
+          "activity": {
+            "id": "https://museum-a.invalid/a/60",
+            "type": "Create",
+            "actor": "https://museum-b.invalid/actors/main",
+            "object": {
+              "id": "https://museum-a.invalid/objects/61",
+              "type": "Note",
+              "attributedTo": "https://museum-b.invalid/actors/main",
+              "content": "冒名投递"
+            },
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        }
+      ],
+      "expected": {
+        "decisions": ["rejected", "rejected"],
+        "reasons": ["unconfigured_source", "untrusted_actor"],
+        "visible_object_ids": [],
+        "tombstoned_object_ids": [],
+        "active_share_activity_ids": [],
+        "withdrawn_share_activity_ids": [],
+        "pending_object_ids": []
+      }
+    },
+    {
+      "name": "remote_context_and_foreign_domain",
+      "situation": "远端 JSON-LD 上下文与未配置域只登记不抓取",
+      "observable": "无任何外联请求，未配置域对象不进入展示视图",
+      "envelopes": [
+        {
+          "source": "museum-a",
+          "observation": "c1",
+          "activity": {
+            "@context": [
+              "https://www.w3.org/ns/activitystreams",
+              "https://context.invalid/extensions/1"
+            ],
+            "id": "https://museum-a.invalid/a/70",
+            "type": "Create",
+            "actor": "https://museum-a.invalid/actors/main",
+            "object": {
+              "id": "https://museum-a.invalid/objects/71",
+              "type": "Note",
+              "attributedTo": "https://museum-a.invalid/actors/main",
+              "content": "带远端上下文的公开稿",
+              "to": ["https://www.w3.org/ns/activitystreams#Public"]
+            },
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-b",
+          "observation": "c2",
+          "activity": {
+            "id": "https://museum-b.invalid/a/72",
+            "type": "Announce",
+            "actor": "https://museum-b.invalid/actors/main",
+            "object": "https://elsewhere.invalid/objects/1",
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        }
+      ],
+      "expected": {
+        "decisions": ["applied", "pending"],
+        "reasons": ["object_details_recorded", "object_details_missing"],
+        "visible_object_ids": ["https://museum-a.invalid/objects/71"],
+        "tombstoned_object_ids": [],
+        "active_share_activity_ids": ["https://museum-b.invalid/a/72"],
+        "observable_active_share_activity_ids": [],
+        "withdrawn_share_activity_ids": [],
+        "pending_object_ids": []
+      }
+    },
+    {
+      "name": "duplicates_do_not_revive",
+      "situation": "源站重发与晚到旧引用不能恢复已确认撤回",
+      "observable": "活动 id 去重，撤展状态保持，重复投递不改状态",
+      "envelopes": [
+        {
+          "source": "museum-a",
+          "observation": "g1",
+          "activity": {
+            "id": "https://museum-a.invalid/a/80",
+            "type": "Create",
+            "actor": "https://museum-a.invalid/actors/main",
+            "object": {
+              "id": "https://museum-a.invalid/objects/81",
+              "type": "Note",
+              "attributedTo": "https://museum-a.invalid/actors/main",
+              "content": "重复投递演练稿",
+              "to": ["https://www.w3.org/ns/activitystreams#Public"]
+            },
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-b",
+          "observation": "g2",
+          "activity": {
+            "id": "https://museum-b.invalid/a/82",
+            "type": "Announce",
+            "actor": "https://museum-b.invalid/actors/main",
+            "object": "https://museum-a.invalid/objects/81",
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-b",
+          "observation": "g3",
+          "activity": {
+            "id": "https://museum-b.invalid/a/83",
+            "type": "Undo",
+            "actor": "https://museum-b.invalid/actors/main",
+            "object": "https://museum-b.invalid/a/82"
+          }
+        },
+        {
+          "source": "museum-b",
+          "observation": "g4",
+          "activity": {
+            "id": "https://museum-b.invalid/a/82",
+            "type": "Announce",
+            "actor": "https://museum-b.invalid/actors/main",
+            "object": "https://museum-a.invalid/objects/81",
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-a",
+          "observation": "g5",
+          "activity": {
+            "id": "https://museum-a.invalid/a/80",
+            "type": "Create",
+            "actor": "https://museum-a.invalid/actors/main",
+            "object": {
+              "id": "https://museum-a.invalid/objects/81",
+              "type": "Note",
+              "attributedTo": "https://museum-a.invalid/actors/main",
+              "content": "重复投递演练稿",
+              "to": ["https://www.w3.org/ns/activitystreams#Public"]
+            },
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        }
+      ],
+      "expected": {
+        "decisions": ["applied", "applied", "applied", "duplicate", "duplicate"],
+        "reasons": [
+          "object_details_recorded",
+          "share_recorded",
+          "share_withdrawn",
+          "activity_id_seen",
+          "activity_id_seen"
+        ],
+        "visible_object_ids": ["https://museum-a.invalid/objects/81"],
+        "tombstoned_object_ids": [],
+        "active_share_activity_ids": [],
+        "withdrawn_share_activity_ids": ["https://museum-b.invalid/a/82"],
+        "pending_object_ids": []
+      }
+    },
+    {
+      "name": "delete_with_unknown_ownership_retained",
+      "situation": "只有转发占位、归属未知时，域外账号删除声明不足为凭",
+      "observable": "原文占位保留并标记待补，删除被拒",
+      "envelopes": [
+        {
+          "source": "museum-b",
+          "observation": "k1",
+          "activity": {
+            "id": "https://museum-b.invalid/a/90",
+            "type": "Announce",
+            "actor": "https://museum-b.invalid/actors/main",
+            "object": "https://museum-a.invalid/objects/91",
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-b",
+          "observation": "k2",
+          "activity": {
+            "id": "https://museum-b.invalid/a/92",
+            "type": "Delete",
+            "actor": "https://museum-b.invalid/actors/main",
+            "object": "https://museum-a.invalid/objects/91",
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        }
+      ],
+      "expected": {
+        "decisions": ["pending", "rejected"],
+        "reasons": ["object_details_missing", "actor_is_not_object_owner"],
+        "visible_object_ids": [],
+        "tombstoned_object_ids": [],
+        "active_share_activity_ids": ["https://museum-b.invalid/a/90"],
+        "observable_active_share_activity_ids": [],
+        "withdrawn_share_activity_ids": [],
+        "pending_object_ids": ["https://museum-a.invalid/objects/91"]
+      }
+    },
+    {
+      "name": "undo_before_announce_and_cross_actor_undo",
+      "situation": "Undo 早于 Announce，且非转发者本人不能撤销",
+      "observable": "挂起的撤回在转发建立时兑现；跨 actor 撤销被拒",
+      "envelopes": [
+        {
+          "source": "museum-b",
+          "observation": "v1",
+          "activity": {
+            "id": "https://museum-b.invalid/a/95",
+            "type": "Undo",
+            "actor": "https://museum-b.invalid/actors/main",
+            "object": "https://museum-b.invalid/a/96"
+          }
+        },
+        {
+          "source": "museum-b",
+          "observation": "v2",
+          "activity": {
+            "id": "https://museum-b.invalid/a/96",
+            "type": "Announce",
+            "actor": "https://museum-b.invalid/actors/main",
+            "object": "https://museum-a.invalid/objects/97",
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-a",
+          "observation": "v3",
+          "activity": {
+            "id": "https://museum-a.invalid/a/98",
+            "type": "Create",
+            "actor": "https://museum-a.invalid/actors/main",
+            "object": {
+              "id": "https://museum-a.invalid/objects/97",
+              "type": "Note",
+              "attributedTo": "https://museum-a.invalid/actors/main",
+              "content": "被反向操作的对象",
+              "to": ["https://www.w3.org/ns/activitystreams#Public"]
+            },
+            "to": ["https://www.w3.org/ns/activitystreams#Public"]
+          }
+        },
+        {
+          "source": "museum-a",
+          "observation": "v4",
+          "activity": {
+            "id": "https://museum-a.invalid/a/99",
+            "type": "Undo",
+            "actor": "https://museum-a.invalid/actors/main",
+            "object": "https://museum-b.invalid/a/96"
+          }
+        }
+      ],
+      "expected": {
+        "decisions": ["pending", "applied", "applied", "rejected"],
+        "reasons": [
+          "undo_waiting_for_announce",
+          "late_announce_withdrawn",
+          "object_details_recorded",
+          "undo_actor_mismatch"
+        ],
+        "visible_object_ids": ["https://museum-a.invalid/objects/97"],
+        "tombstoned_object_ids": [],
+        "active_share_activity_ids": [],
+        "withdrawn_share_activity_ids": ["https://museum-b.invalid/a/96"],
+        "pending_object_ids": []
+      }
+    }
+  ]
+}

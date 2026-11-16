@@ -1,6 +1,6 @@
 # 合作馆 ActivityPub 公共动态的对象级采集
 
-这是资料接收程序的基础版。它请求来源接口，保留响应状态、头部、原始内容与每次观察的时间，能够从 JSON、CSV 或门户嵌入的数据块读回来源记录。当前不生成面向业务的有效版本，也不自动执行门户提交；重复观察会分别保留，原始内容按摘要复用。
+这是资料接收程序。它请求来源接口，保留响应状态、头部、原始内容与每次观察的时间，能够从 JSON、CSV 或门户嵌入的数据块读回来源记录。在此之上提供只读的 ActivityPub 公共资料采集：把活动身份、对象身份与某账号对对象的展示关系分开解释，按馆方口径输出当前可展示对象和转发关系，并为每次判定保留事件依据。当前不生成面向业务的有效版本，也不自动执行门户提交；重复观察会分别保留，原始内容按摘要复用。
 
 ## 运行环境
 
@@ -35,10 +35,24 @@ python3 -m heritage_images capture --base-url http://127.0.0.1:实际端口 --ar
 
 归档库只追加来源观察，不用最后一条响应覆盖先前响应。`archive.py` 管理原始内容及完整性，`client.py` 执行一次请求，`decoding.py` 负责来源格式解码，`origin.py` 提供协议演练。业务解释可与原始接收独立演进。
 
+## 只读公共资料采集
+
+`partners.py` 保存合作源到 actor、域的本地信任名录，`catalog.py` 在独立 SQLite 目录中维护三层身份：活动（按 activity id 去重）、对象（原作者唯一投影）、展示关系（某账号的转发及撤回）。全程只读、无外联请求：不发送联邦消息，不抓取 `@context` 远端 JSON-LD，未配置域只留隐藏占位。
+
+关键口径：Undo 只取消转发者本人的那次 Announce，不删原作者对象；Delete 需同时通过可信来源与对象归属核对，他馆转来的删除声明不足以抹掉原文；引用先于详情时登记待补占位，不把 URL 当正文；重复活动、源站失联后的重发与晚到旧引用都不能恢复已确认的撤展或墓碑。
+
+```sh
+python3 -m heritage_images federation-demo
+python3 -m heritage_images catalog --partners fixtures/partners.json --catalog .runtime/catalog.sqlite3 --feed feed.json
+python3 -m heritage_images review --catalog .runtime/catalog.sqlite3
+```
+
+设计细节见 `docs/federation-collection.md`，交错场景与可观察口径见 `fixtures/federation_cases.json`。
+
 ## 开发资料
 
-来源协议见 `docs/source-protocol.md`，领域观察关系见 `tests/test_source_contract.py`。`fixtures/business_cases.json` 保存业务侧关注的交错情况及可观察口径；基础版测试验证的是原始采集和协议，不代表业务处理已经具备这些能力。所有条目、机构、文件内容和门户回执均为本地合成资料，不包含真实用户身份。
+来源协议见 `docs/source-protocol.md`，领域观察关系见 `tests/test_source_contract.py`。`fixtures/business_cases.json` 保存业务侧关注的交错情况及可观察口径；对象级口径的可执行版本在 `fixtures/federation_cases.json` 与 `tests/test_federation.py`。所有条目、机构、文件内容和门户回执均为本地合成资料，不包含真实用户身份。
 
 ## Wheel 分发
 
-构建产物位于 `dist/`，包含 `heritage_images` 和命名空间内的合成来源 JSON。安装 wheel 后，即使当前目录不是源码目录，也可执行 `python3 -m heritage_images demo`。提供 `serve --scenario` 时仍以指定文件为准，找不到指定文件会直接报错，不回退到默认资料。
+构建产物位于 `dist/`，包含 `heritage_images` 和命名空间内的合成来源 JSON（含 `partners.json`、`federation_cases.json`）。安装 wheel 后，即使当前目录不是源码目录，也可执行 `python3 -m heritage_images demo` 与 `python3 -m heritage_images federation-demo`。提供 `serve --scenario` 时仍以指定文件为准，找不到指定文件会直接报错，不回退到默认资料。
